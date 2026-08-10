@@ -1,0 +1,347 @@
+import * as React from "react";
+import { clsx as cx } from "clsx"; // TODO: source not present — original en.cx; inferred as clsx
+import { AsciiCanvas } from "./AsciiCanvas.jsx";
+import { computeContentBounds } from "../utils/computeContentBounds.js";
+import { easeOutCubic } from "../utils/easeOutCubic.js";
+import { ASCII_ANIMATION_DURATION_MS } from "../utils/constants.js";
+
+/**
+ * High-level ASCII typewriter component.
+ * Manages progress / colorProgress animation, click-to-reveal, reduced-motion,
+ * content-bounds scaling, and keyboard shortcut (C) for replay.
+ * original: fN  (exported as AsciiTypewriter, module 271913)
+ */
+export function AsciiTypewriter({
+  imageSrc,
+  className,
+  color = "#ff6b4a",
+  cellSize,
+  delay = 100,
+  duration = ASCII_ANIMATION_DURATION_MS,
+  colorDelay = 150,
+  onComplete,
+  alignX = "center",
+  alignY = "bottom",
+  fit = "cover",
+  mobileFit,
+  enableHover = false,
+  hoverMode = "stretch",
+  hoverIntensity,
+  mouseX = 0,
+  mouseY = 0,
+  mouseRef,
+  revealEnd = 0.85,
+  randomness = 0.3,
+  linear = false,
+  enableGooeyReveal = false,
+  gooeyRadius = 0.06,
+  gooeySoftness = 0.08,
+  gooeyNoiseIntensity = 0.03,
+  isHovering = false,
+  enableDepthParallax = false,
+  depthMapSrc,
+  parallaxIntensity = 0.02,
+  externalProgress,
+  externalColorProgress,
+  disableInternalAnimation = false,
+  colorDark,
+  depthDetailMin,
+  revealOrigin = { x: 0.5, y: 0.5 },
+  frameloop,
+  debugLabel,
+  dpr,
+  skipContentBounds = false,
+}) {
+  const effectRef = React.useRef(null);
+  const [progress, setProgress] = React.useState(0);
+  const [colorProgress, setColorProgress] = React.useState(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
+  const [contentBoundsScale, setContentBoundsScale] = React.useState(1);
+  const [clickColorProgress, setClickColorProgress] = React.useState(null);
+  const [clickPoint, setClickPoint] = React.useState(null);
+  const [clickRadialInvert, setClickRadialInvert] = React.useState(false);
+  const [impactProgress, setImpactProgress] = React.useState(0);
+
+  const animationStartedRef = React.useRef(false);
+  const clickAnimFrameRef = React.useRef(null);
+  const impactAnimFrameRef = React.useRef(null);
+  const internalAnimDoneRef = React.useRef(false);
+  const lastClickTimeRef = React.useRef(0);
+  const revealOriginRef = React.useRef(revealOrigin);
+  revealOriginRef.current = revealOrigin;
+
+  const containerRef = React.useRef(null);
+  const isIntersectingRef = React.useRef(false);
+
+  // Compute content bounds once
+  React.useEffect(() => {
+    if (skipContentBounds) return;
+    computeContentBounds(imageSrc, revealOrigin).then((scale) => {
+      setContentBoundsScale(scale);
+    });
+  }, [imageSrc, revealOrigin.x, revealOrigin.y, revealOrigin, skipContentBounds]);
+
+  // Reduced-motion preference
+  React.useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mq.matches);
+    const handler = (e) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const useExternalProgress =
+    disableInternalAnimation && externalProgress !== undefined;
+
+  // Internal typewriter animation
+  React.useEffect(() => {
+    if (disableInternalAnimation) {
+      internalAnimDoneRef.current = true;
+      return;
+    }
+    if (prefersReducedMotion) {
+      setProgress(1);
+      setColorProgress(1);
+      internalAnimDoneRef.current = true;
+      onComplete?.();
+      return;
+    }
+
+    const start = performance.now();
+    let rafId;
+
+    const tick = (now) => {
+      const elapsed = now - start - delay;
+      if (elapsed < 0) {
+        rafId = requestAnimationFrame(tick);
+        return;
+      }
+
+      const t = Math.min(elapsed / duration, 1);
+      setProgress(linear ? t : easeOutCubic(t));
+
+      const colorElapsed = elapsed - colorDelay;
+      if (colorElapsed > 0) {
+        const ct = Math.min(colorElapsed / duration, 1);
+        setColorProgress(linear ? ct : easeOutCubic(ct));
+      }
+
+      const colorDone = colorElapsed >= duration;
+      if (t < 1 || !colorDone) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        internalAnimDoneRef.current = true;
+        onComplete?.();
+      }
+    };
+
+    rafId = requestAnimationFrame(tick);
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [delay, duration, colorDelay, linear, prefersReducedMotion, onComplete, disableInternalAnimation]);
+
+  // Click-triggered radial color sweep
+  const triggerClickReveal = React.useRef(() => {});
+  triggerClickReveal.current = (point, delayMs = 0) => {
+    if (!internalAnimDoneRef.current || clickAnimFrameRef.current !== null) return;
+
+    const invert = !animationStartedRef.current;
+    animationStartedRef.current = invert;
+    const startTime = performance.now();
+    lastClickTimeRef.current = startTime;
+    setClickPoint(point);
+    if (point) setClickRadialInvert(invert);
+
+    if (prefersReducedMotion) {
+      setClickColorProgress(+!invert);
+      setClickPoint(null);
+      setClickRadialInvert(false);
+      return;
+    }
+
+    const run = () => {
+      const from = +!!invert;
+      const to = +!invert;
+      const animate = (now) => {
+        const t = Math.min((now - startTime) / ASCII_ANIMATION_DURATION_MS, 1);
+        setClickColorProgress(from + (to - from) * easeOutCubic(t));
+        if (t < 1) {
+          clickAnimFrameRef.current = requestAnimationFrame(animate);
+        } else {
+          clickAnimFrameRef.current = null;
+          if (lastClickTimeRef.current === startTime) {
+            setClickPoint(null);
+            setClickRadialInvert(false);
+          }
+        }
+      };
+      clickAnimFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    if (delayMs > 0) {
+      setTimeout(run, delayMs);
+    } else {
+      run();
+    }
+  };
+
+  // Impact flash animation
+  const triggerImpact = React.useRef(() => {});
+  triggerImpact.current = () => {
+    if (prefersReducedMotion) return;
+    if (impactAnimFrameRef.current !== null) {
+      cancelAnimationFrame(impactAnimFrameRef.current);
+    }
+    setImpactProgress(0);
+    const start = performance.now();
+    const animate = (now) => {
+      const t = Math.min((now - start) / 500, 1);
+      setImpactProgress(Math.sin((t * Math.PI) / 2));
+      if (t < 1) {
+        impactAnimFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        impactAnimFrameRef.current = null;
+      }
+    };
+    impactAnimFrameRef.current = requestAnimationFrame(animate);
+  };
+
+  // Keyboard shortcut: "C" to replay from current revealOrigin
+  React.useEffect(() => {
+    const onKeyDown = (e) => {
+      if (
+        (e.key !== "c" && e.key !== "C") ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.altKey
+      ) {
+        return;
+      }
+      const tag = e.target?.tagName;
+      if (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        e.target?.isContentEditable
+      ) {
+        return;
+      }
+      if (isIntersectingRef.current) {
+        lastClickTimeRef.current = performance.now();
+        setClickPoint(revealOriginRef.current);
+        triggerImpact.current();
+        triggerClickReveal.current(revealOriginRef.current);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  // Cleanup animation frames
+  React.useEffect(() => {
+    return () => {
+      if (clickAnimFrameRef.current !== null) {
+        cancelAnimationFrame(clickAnimFrameRef.current);
+        clickAnimFrameRef.current = null;
+      }
+      if (impactAnimFrameRef.current !== null) {
+        cancelAnimationFrame(impactAnimFrameRef.current);
+        impactAnimFrameRef.current = null;
+      }
+    };
+  }, []);
+
+  // Track intersection for keyboard shortcut
+  React.useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry) {
+          isIntersectingRef.current = entry.isIntersecting;
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const onClick = React.useCallback((e) => {
+    if (!internalAnimDoneRef.current || clickAnimFrameRef.current !== null) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = 1 - (e.clientY - rect.top) / rect.height;
+    lastClickTimeRef.current = performance.now();
+    setClickPoint({ x, y });
+    triggerImpact.current();
+    triggerClickReveal.current({ x, y });
+  }, []);
+
+  const effectiveColorProgress =
+    clickColorProgress !== null
+      ? clickColorProgress
+      : prefersReducedMotion
+        ? 1
+        : useExternalProgress
+          ? externalColorProgress ?? externalProgress
+          : colorProgress;
+
+  return (
+    <div
+      ref={containerRef}
+      onClick={onClick}
+      className="size-full cursor-pointer"
+    >
+      <AsciiCanvas
+        imageSrc={imageSrc}
+        className={cx("size-full", className)}
+        color={color}
+        {...(cellSize !== undefined ? { cellSize } : {})}
+        progress={
+          (prefersReducedMotion
+            ? 1
+            : useExternalProgress
+              ? externalProgress
+              : progress) * contentBoundsScale
+        }
+        colorProgress={effectiveColorProgress * contentBoundsScale}
+        randomness={randomness}
+        revealDirection={alignX === "right" ? -1 : 1}
+        revealEnd={revealEnd}
+        effectRef={effectRef}
+        alignX={alignX}
+        alignY={alignY}
+        fit={fit}
+        mobileFit={mobileFit}
+        enableHover={enableHover}
+        hoverMode={hoverMode}
+        hoverIntensity={hoverIntensity}
+        mouseX={mouseX}
+        mouseY={mouseY}
+        mouseRef={mouseRef}
+        enableGooeyReveal={enableGooeyReveal}
+        gooeyRadius={gooeyRadius}
+        gooeySoftness={gooeySoftness}
+        gooeyNoiseIntensity={gooeyNoiseIntensity}
+        isHovering={isHovering}
+        enableDepthParallax={enableDepthParallax}
+        depthMapSrc={depthMapSrc}
+        parallaxIntensity={parallaxIntensity}
+        clickPoint={clickPoint}
+        clickRadialInvert={clickRadialInvert}
+        impactProgress={impactProgress}
+        revealOrigin={revealOrigin}
+        {...(colorDark !== undefined ? { colorDark } : {})}
+        {...(depthDetailMin !== undefined ? { depthDetailMin } : {})}
+        {...(frameloop !== undefined ? { frameloop } : {})}
+        {...(debugLabel !== undefined ? { debugLabel } : {})}
+        {...(dpr !== undefined ? { dpr } : {})}
+      />
+    </div>
+  );
+}
+
+// Named export registration (original e.s(["AsciiTypewriter", () => fN], 271913))
+export { AsciiTypewriter as default };
