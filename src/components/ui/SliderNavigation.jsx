@@ -1,6 +1,6 @@
 import React from 'react';
-import { cx } from '@/vendor/cx';
-import { useSliderContext } from '@/components/Slider';
+import { cx } from '@lib/vendor';
+import { useSliderContext } from '@components/ui/Slider';
 
 export function SliderNavigation({ className }) {
   const { embla, scrollSnaps, selectedIndex } = useSliderContext();

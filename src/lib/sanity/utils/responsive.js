@@ -1,5 +1,5 @@
 // lib/responsive.js
-import { screens } from "@/theme/screens"; // derived path for 112726
+import { screens } from '@/shared/constants/screens';// derived path for 112726
 
 function parseRem(value) {
   return Number.parseFloat(value.replace("rem", ""));

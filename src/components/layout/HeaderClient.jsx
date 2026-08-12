@@ -4,20 +4,20 @@ import React, { useState, useRef, useCallback, useEffect, useMemo, useLayoutEffe
 import { usePathname } from 'next/navigation';
 import { useLenis } from 'lenis/react';
 
-import { usePageTransition } from '@/hooks/usePageTransition';
-import { useModal } from '@/hooks/useModal';
-import { usePageEnterContext } from '@/hooks/usePageEnterContext';
-import { usePreloader } from '@/hooks/usePreloader';
-import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { useAsciiDelay } from '@/hooks/useAsciiDelay';
-import { usePageEnter } from '@/hooks/usePageEnter';
-import { getLenis } from '@/components/LenisProvider';
-import { cx } from '@/vonder';
-import { HeaderLogo } from '@/components/HeaderLogo';
-import { MenuButton } from '@/components/MenuButton';
-import { NavigationFlyout } from '@/components/NavigationFlyout';
-import { AnimatedButton } from '@/components/AnimatedButton';
-import { SECTION_THEME_SELECTOR, NAV_SCROLL_THRESHOLDS } from '@/constants/navScroll';
+import { usePageTransition } from '@shared/hooks/usePageTransition';
+import { useModal } from "@shared/hooks/useModal"; 
+import { usePageEnterContext } from '@providers/PageEnterProvider';
+import { usePreloader } from '@providers/PreloaderProvider';
+import { useBreakpoint } from '@shared/hooks/useIsTouchDevice';
+import { useAsciiDelay } from '@features/ascii/hooks/useAsciiDelay';
+import { usePageEnter } from '@shared/hooks/usePageEnter';
+import { getLenis } from '@providers/LenisProvider';
+import { cx } from '@lib/vendor';
+import { HeaderLogo } from '@components/layout/HeaderLogo';
+import { MenuButton } from '@components/ui/MenuButton';
+import { NavigationFlyout } from '@components/layout/NavigationFlyout';
+import { AnimatedButton } from '@features/animations/components/AnimatedButton';
+import { SECTION_THEME_SELECTOR, NAV_SCROLL_THRESHOLDS } from '@shared/constants/NavScroll';
 
 
 

@@ -1,11 +1,11 @@
 // components/SanityImage.jsx
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { cx } from "@/lib/utils"; // derived path for 801335
-import { Image, createResponsiveSizes } from "@/components/Image"; // derived path for 506585
-import { parseAspectRatio, parseResponsiveValues } from "@/lib/responsive"; // derived path for 2379, 601247
-import { run } from "@/lib/run"; // derived path for 46995
-import { getImageDimensions, getImageSrc, getImageSrcSet, getLqipBackgroundStyle } from "@/lib/sanity-image-utils"; // derived path for 574660
+import { cx } from '@lib/vendor';
+import { Image, createResponsiveSizes } from '@lib/sanity/components/Image';
+import { parseAspectRatio, parseResponsiveValues } from '@lib/sanity/utils/responsive';
+import { run } from '@lib/sanity/utils/run';
+import { getImageDimensions, getImageSrc, getImageSrcSet, getLqipBackgroundStyle } from '@lib/sanity/utils/sanity-imageutils';
 
 const loadedImageSet = new Set();
 

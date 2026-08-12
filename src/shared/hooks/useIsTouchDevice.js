@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useIsoLayoutEffect } from './useIsoLayoutEffect';
-import { screens } from '@features/constants/screens';
+import { useIsoLayoutEffect } from '@shared/hooks/useIsoLayoutEffect';
+import { screens } from '@shared/constants/screens';
 
 function useMediaQuery(query, initializeWithValue) {
   const [matches, setMatches] = useState(initializeWithValue !== undefined ? initializeWithValue : false);
@@ -9,10 +9,8 @@ function useMediaQuery(query, initializeWithValue) {
   useIsoLayoutEffect(() => {
     let isActive = true;
     
-    
     const parsedQuery = query.substring(query.indexOf("(")).trim();
     const mediaQueryList = window.matchMedia(parsedQuery);
-    
     const handleChange = () => {
       if (isActive) {
         setMatches(mediaQueryList.matches);

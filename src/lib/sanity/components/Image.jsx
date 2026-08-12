@@ -1,7 +1,7 @@
 // components/Image.jsx
 import React from "react";
 import { preload } from "react-dom";
-import { parseResponsiveValues } from "@/lib/responsive"; // derived path for 601247
+import { parseResponsiveValues } from '@lib/sanity/utils/responsive';// derived path for 601247
 
 export function createResponsiveSizes(sizesStr) {
   const defaultSize = "100vw";

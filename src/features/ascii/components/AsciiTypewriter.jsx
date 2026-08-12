@@ -1,16 +1,12 @@
 import * as React from "react";
-import { clsx as cx } from "clsx"; // TODO: source not present — original en.cx; inferred as clsx
-import { AsciiCanvas } from "./AsciiCanvas.jsx";
-import { computeContentBounds } from "../utils/computeContentBounds.js";
-import { easeOutCubic } from "../utils/easeOutCubic.js";
-import { ASCII_ANIMATION_DURATION_MS } from "../utils/constants.js";
+import { clsx as cx } from "clsx"; 
+import { AsciiCanvas } from "@features/ascii/components/AsciiTypewriter";
+import { computeContentBounds } from "@features/ascii/utils/computeContentBounds";
+import { easeOutCubic } from "@features/ascii/utils/easeOutCubic";
+import { ASCII_ANIMATION_DURATION } from "@shared/constants/constants";
 
-/**
- * High-level ASCII typewriter component.
- * Manages progress / colorProgress animation, click-to-reveal, reduced-motion,
- * content-bounds scaling, and keyboard shortcut (C) for replay.
- * original: fN  (exported as AsciiTypewriter, module 271913)
- */
+const ASCII_ANIMATION_DURATION_MS = ASCII_ANIMATION_DURATION * 1000;
+
 export function AsciiTypewriter({
   imageSrc,
   className,
@@ -73,7 +69,7 @@ export function AsciiTypewriter({
   const containerRef = React.useRef(null);
   const isIntersectingRef = React.useRef(false);
 
-  // Compute content bounds once
+  
   React.useEffect(() => {
     if (skipContentBounds) return;
     computeContentBounds(imageSrc, revealOrigin).then((scale) => {
@@ -81,7 +77,7 @@ export function AsciiTypewriter({
     });
   }, [imageSrc, revealOrigin.x, revealOrigin.y, revealOrigin, skipContentBounds]);
 
-  // Reduced-motion preference
+  
   React.useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setPrefersReducedMotion(mq.matches);
@@ -93,7 +89,7 @@ export function AsciiTypewriter({
   const useExternalProgress =
     disableInternalAnimation && externalProgress !== undefined;
 
-  // Internal typewriter animation
+  
   React.useEffect(() => {
     if (disableInternalAnimation) {
       internalAnimDoneRef.current = true;
@@ -141,7 +137,7 @@ export function AsciiTypewriter({
     };
   }, [delay, duration, colorDelay, linear, prefersReducedMotion, onComplete, disableInternalAnimation]);
 
-  // Click-triggered radial color sweep
+  
   const triggerClickReveal = React.useRef(() => {});
   triggerClickReveal.current = (point, delayMs = 0) => {
     if (!internalAnimDoneRef.current || clickAnimFrameRef.current !== null) return;
@@ -186,7 +182,7 @@ export function AsciiTypewriter({
     }
   };
 
-  // Impact flash animation
+  
   const triggerImpact = React.useRef(() => {});
   triggerImpact.current = () => {
     if (prefersReducedMotion) return;
@@ -207,7 +203,7 @@ export function AsciiTypewriter({
     impactAnimFrameRef.current = requestAnimationFrame(animate);
   };
 
-  // Keyboard shortcut: "C" to replay from current revealOrigin
+  
   React.useEffect(() => {
     const onKeyDown = (e) => {
       if (
@@ -238,7 +234,7 @@ export function AsciiTypewriter({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  // Cleanup animation frames
+  
   React.useEffect(() => {
     return () => {
       if (clickAnimFrameRef.current !== null) {
@@ -252,7 +248,7 @@ export function AsciiTypewriter({
     };
   }, []);
 
-  // Track intersection for keyboard shortcut
+  
   React.useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -343,5 +339,5 @@ export function AsciiTypewriter({
   );
 }
 
-// Named export registration (original e.s(["AsciiTypewriter", () => fN], 271913))
+
 export { AsciiTypewriter as default };

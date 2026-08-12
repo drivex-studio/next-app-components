@@ -1,17 +1,13 @@
 import * as React from "react";
-import { Canvas } from "@react-three/fiber"; // TODO: source not present — original db
-import { clsx as cx } from "clsx"; // TODO: source not present — original en.cx; inferred as clsx
-import { useIsTouchDevice } from "../hooks/useIsTouchDevice.js"; // TODO: source not present — original fo.useIsTouchDevice (module 537836)
-import { DEFAULT_CHARACTERS } from "../effects/ASCIIEffect.js";
-import { HoverImage } from "./HoverImage.jsx";
-import { AsciiEffectComponent } from "./AsciiEffect.jsx";
-import { DemandFrameloop } from "./DemandFrameloop.jsx";
+import { Canvas } from "@react-three/fiber"; 
+import { clsx as cx } from "clsx"; 
+import { useIsTouchDevice } from '@shared/hooks/useIsTouchDevice';
+import { DEFAULT_CHARACTERS } from "@features/ascii/effects/ASCIIEffect";
+import { HoverImage } from "@features/ascii/components/HoverImage";
+import { AsciiEffectComponent } from '@features/ascii/utils/AsciiEffect';
+import { DemandFrameloop } from "@features/ascii/components/DemandFrameloop";
 
-/**
- * Full R3F Canvas hosting the image mesh + ASCII post-processing effect.
- * Handles responsive cell size, visibility-based frameloop, and DPR.
- * original: fC
- */
+
 export function AsciiCanvas({
   imageSrc,
   className,
@@ -93,7 +89,7 @@ export function AsciiCanvas({
   const [computedCellSize, setComputedCellSize] = React.useState(cs);
   const [isVisible, setIsVisible] = React.useState(true);
 
-  // Pause rendering when off-screen (only when frameloop === "always")
+  
   React.useEffect(() => {
     if (frameLoop !== "always") return;
     const el = containerRef.current;
@@ -123,7 +119,7 @@ export function AsciiCanvas({
     };
   }, [frameLoop]);
 
-  // Responsive cell size based on container dimensions + DPR
+  
   React.useEffect(() => {
     const el = containerRef.current;
     if (!el) return;

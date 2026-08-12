@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ['three', '@react-three/fiber', '@react-three/drei', 'gsap'],
   images: {
     remotePatterns: [
       {
@@ -9,4 +10,5 @@ const nextConfig = {
     ],
   },
 };
-export default nextConfig;  
+
+export default nextConfig;

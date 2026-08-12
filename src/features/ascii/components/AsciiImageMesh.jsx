@@ -1,13 +1,9 @@
 import * as React from "react";
-import { useThree } from "@react-three/fiber"; // TODO: source not present — original hO
-import { TextureLoader } from "three"; // TODO: source not present — original sG
+import { useThree } from "@react-three/fiber"; 
+import { TextureLoader } from "three"; 
 import { resolveImageSrc } from "../utils/resolveImageSrc.js";
 
-/**
- * Renders a textured plane that fits/covers the viewport according to align & fit props.
- * Supports optional stretch and rotation for hover effects.
- * original: f_
- */
+
 export function AsciiImageMesh({
   imageSrc,
   onLoad,

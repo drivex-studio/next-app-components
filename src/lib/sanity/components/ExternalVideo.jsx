@@ -1,7 +1,8 @@
-// components/ExternalVideo.jsx
+
 import React, { useRef, useState, useEffect } from "react";
-import { cx } from "@/lib/utils"; // derived path for 801335
-import { createResponsiveRatios } from "@/lib/responsive"; // derived path for 2379
+import { cx } from '@lib/vendor';
+
+import { createResponsiveRatios } from '@lib/sanity/utils/responsive';
 
 export function ExternalVideo(props) {
   const {
@@ -79,4 +80,3 @@ export function ExternalVideo(props) {
     </div>
   );
 }
-// original module ID: 473029

@@ -1,7 +1,7 @@
 import React, { createContext, useRef, useState, useContext, useMemo, useCallback } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import useIdleGSAP from '../hooks/useIdleGSAP';
+import useIdleGSAP from '@shared/hooks/useIdleGSAP';
 
 gsap.registerPlugin(ScrollTrigger);
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
-import { usePageTransition } from '@/hooks/usePageTransition';
+import { usePageTransition } from '@/shared/hooks/usePageTransition';
 
 function isModifiedEvent(event) {
   const { nodeName } = event.currentTarget;

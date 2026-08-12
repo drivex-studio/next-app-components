@@ -1,4 +1,4 @@
-import { cx } from '@/vendor';
+import { cx } from '@lib/vendor';
 
 export function MenuButton({
   isOpen,

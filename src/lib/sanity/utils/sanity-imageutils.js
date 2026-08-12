@@ -1,8 +1,16 @@
-// lib/sanity-image-utils.js
 import { createImageUrlBuilder } from "next-sanity";
-import { env } from "@/env.mjs"; // TODO: source not present in bundle, assuming generic path for 831082
-import { run } from "@/lib/run"; // derived path for 46995
-import { DEFAULT_MAX_WIDTH, DEFAULT_MAX_HEIGHT, DEFAULT_SOURCE_WIDTHS } from "@/lib/constants"; // derived path for 181028
+import { env } from 'env';
+
+import {
+  DEFAULT_MAX_WIDTH,
+  DEFAULT_MAX_HEIGHT,
+  DEFAULT_SOURCE_WIDTHS,
+} from '@shared/constants/constants';
+
+
+
+import { run } from '@lib/sanity/utils/run';
+
 
 const builder = createImageUrlBuilder({
   projectId: env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -130,4 +138,3 @@ export function getImageSrcSet(image, options = {}) {
     return srcSetEntries;
   }).filter(Boolean).join(", ");
 }
-// original module ID: 574660

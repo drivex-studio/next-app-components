@@ -2,8 +2,8 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { usePageTransitionContext } from "../contexts/PageTransitionContext";
-import cx from "../utils/cx";
+import { usePageTransitionContext } from '@providers/PageTransitionProvider';
+import { cx } from '@lib/vendor';
 
 gsap.registerPlugin(useGSAP);
 

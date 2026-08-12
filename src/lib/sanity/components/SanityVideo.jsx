@@ -1,12 +1,11 @@
 // components/SanityVideo.jsx
 import React, { Suspense, useRef } from "react";
 import dynamic from "next/dynamic";
-import { cx } from "@/lib/utils"; // derived path for 801335
-import { createResponsiveRatios } from "@/lib/responsive"; // derived path for 2379
-import { run } from "@/lib/run"; // derived path for 46995
-import { DEFAULT_MAX_WIDTH } from "@/lib/constants"; // derived path for 181028
-
-const MuxPlayer = dynamic(() => import("@mux/mux-player-react").then((mod) => mod.MuxPlayer)); // TODO: source not present in bundle, assuming standard @mux/mux-player-react
+import { cx } from '@lib/vendor';// derived path for 801335
+import { createResponsiveRatios } from '@lib/sanity/utils/responsive';
+import { run } from '@lib/sanity/utils/run';
+import { DEFAULT_MAX_WIDTH } from "@shared/constants/constants"; 
+const MuxPlayer = dynamic(() => import("@mux/mux-player-react").then((mod) => mod.MuxPlayer));
 
 function calculateHeight(value) {
   const ratio = Math.min(value / DEFAULT_MAX_WIDTH, 1);

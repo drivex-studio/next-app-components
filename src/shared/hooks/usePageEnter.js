@@ -1,5 +1,5 @@
 import { useRef, useEffect, useMemo } from 'react';
-import { usePageEnterContext } from '@contexts/PageEnterProvider';
+import { usePageEnterContext } from '@providers/PageEnterProvider';
 
 
 export function usePageEnter(callback, options = {}) {

@@ -1,7 +1,7 @@
 import React, { forwardRef, useRef, useState, useLayoutEffect, useCallback, useImperativeHandle, Fragment } from 'react';
-import { gsap, useGSAP, ScrollTrigger } from '@/vendor';
-import { useIdleGSAP } from '@/hooks/useIdleGSAP'; 
-import { cx } from '@/vendor'; 
+import { gsap, useGSAP, ScrollTrigger } from '@lib/vendor';
+import useIdleGSAP from '@shared/hooks/useIdleGSAP';
+import { cx } from '@lib/vendor';
 
 
 const typographyClasses = {

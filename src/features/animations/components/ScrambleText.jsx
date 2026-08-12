@@ -1,6 +1,6 @@
 import React, { useRef, useContext, useEffect, useCallback, useMemo } from 'react';
 import gsap from 'gsap';
-import { ScrambleGroupContext } from '@/contexts/ScrambleGroupContext';
+import { ScrambleGroupContext } from '@providers/ScrambleGroupProvider';
 
 export default function ScrambleText({
   children,

@@ -9,7 +9,7 @@ import React, {
   useContext 
 } from 'react';
 
-import { scrollToTop } from '@/utilities/LenisProvider';
+import { scrollToTop } from '@providers/LenisProvider';
 
 const PageTransitionContext = createContext(null);
 let scrollTriggerModulePromise = null;

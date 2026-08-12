@@ -1,18 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
-import { useGSAP, gsap } from '@/vendor';
+import { useGSAP, gsap } from '@lib/vendor';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { AnimatedHeadline } from '@animations/AnimatedHeadline';
-import { AnimatedButton } from '@animations/AnimatedButton';
-import { useAsciiDelay } from '@/hooks/useAsciiDelay';
-import { useIsTouchDevice } from '../hooks/useIsTouchDevice';
-import { useMousePosition } from '@/hooks/useMousePosition';
-import { usePageEnter } from '../hooks/usePageEnter';
-import { useHideFooter } from '@/contexts/FooterContext';
-import { ASCII_GSAP_DURATION, ASCII_EASE, ASCII_COLOR_DELAY } from '../features/constants/asciiConfig';
+import { AnimatedHeadline } from '@features/animations/components/AnimatedHeadline';
+import { AnimatedButton } from '@features/animations/components/AnimatedButton';
+import { useAsciiDelay } from '@features/ascii/hooks/useAsciiDelay';
+import { useIsTouchDevice } from '@shared/hooks/useIsTouchDevice';
+import { useMousePosition } from '@shared/hooks/useMousePosition';
+import { usePageEnter } from '@shared/hooks/usePageEnter';
+import { useHideFooter } from '@providers/FooterProvider';
+import { ASCII_GSAP_DURATION, ASCII_EASE, ASCII_COLOR_DELAY } from '@shared/constants/constants';
 
 const AsciiTypewriter = dynamic(
-  () => import('../components/AsciiTypewriter').then((mod) => mod.AsciiTypewriter),
+  () => import('@features/ascii/components/AsciiTypewriter').then((mod) => mod.AsciiTypewriter),
   { ssr: false }
 );
 

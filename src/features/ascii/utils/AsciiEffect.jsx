@@ -1,15 +1,11 @@
 import * as React from "react";
-import { useFrame } from "@react-three/fiber"; // TODO: source not present — original hB
-import { EffectComposer } from "@react-three/postprocessing"; // TODO: source not present — original fi (inferred from <fi multisampling={0}>)
-import { TextureLoader } from "three"; // TODO: source not present — original sG
+import { useFrame } from "@react-three/fiber"; 
+import { EffectComposer } from "@react-three/postprocessing"; 
+import { TextureLoader } from "three"; 
 import { ASCIIEffect, DEFAULT_CHARACTERS } from "../effects/ASCIIEffect.js";
 import { resolveImageSrc } from "../utils/resolveImageSrc.js";
 
-/**
- * Creates and drives the ASCIIEffect instance, syncing uniforms from props
- * and handling depth-map loading + mouse/parallax/gooey updates each frame.
- * original: fw
- */
+
 export function AsciiEffectComponent({
   characters = DEFAULT_CHARACTERS,
   fontSize = 54,
@@ -94,7 +90,7 @@ export function AsciiEffectComponent({
     ]
   );
 
-  // Load depth map when enabled
+  
   React.useEffect(() => {
     if (!depthMapSrc || !enableDepthParallax) return;
     const loader = new TextureLoader();
@@ -120,7 +116,7 @@ export function AsciiEffectComponent({
       state.invalidate();
     }
 
-    // Parallax offset smoothing
+    
     if (enableDepthParallax) {
       const targetX = isHovering ? -mx * parallaxIntensity : 0;
       const targetY = isHovering ? -my * parallaxIntensity * 0.5 : 0;
@@ -143,7 +139,7 @@ export function AsciiEffectComponent({
       }
     }
 
-    // Gooey intensity + scramble seed
+    
     if (enableGooeyReveal) {
       effect.setMousePosition((mx + 1) / 2, (my + 1) / 2);
 
@@ -168,7 +164,7 @@ export function AsciiEffectComponent({
     }
   });
 
-  // Expose effect instance via ref
+  
   React.useEffect(() => {
     if (effectRef) {
       effectRef.current = effect;

@@ -1,13 +1,5 @@
 import { resolveImageSrc } from "./resolveImageSrc.js";
 
-/**
- * Computes the relative radius of non-transparent content from a given origin.
- * Used to scale the reveal animation so it finishes when the last visible pixel is reached.
- * original: fI
- * @param {string} src
- * @param {{ x: number, y: number }} origin
- * @returns {Promise<number>}
- */
 export async function computeContentBounds(
   src,
   origin = { x: 0.5, y: 0.5 }

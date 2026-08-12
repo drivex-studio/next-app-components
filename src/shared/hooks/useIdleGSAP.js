@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useGSAP } from '@gsap/react';
-import { usePageTransition } from './usePageTransition';
+import { usePageTransition } from '@shared/hooks/usePageTransition';
 
 
 export default function useIdleGSAP(callback, config) {

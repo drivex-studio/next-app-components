@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import { Slot, Slottable } from '@radix-ui/react-slot';
-import { cx } from '@/vendor'; 
+import { cx } from '@lib/vendor';
 
 export const AnimatedLink = forwardRef(function AnimatedLink(props, ref) {
   const {

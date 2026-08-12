@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { gsap, useGSAP, cx } from '@/vendor';
-import { usePreloader } from '@/contexts/PreloaderProvider';
-import ScrambleText from './ScrambleText';
+import { gsap, useGSAP, cx } from '@lib/vendor';
+import { usePreloader } from '@providers/PreloaderProvider';
+import ScrambleText from '@features/animations/components/ScrambleText';
 
 export default function Preloader() {
   const { phase, setPhase, isInitialLoad } = usePreloader();

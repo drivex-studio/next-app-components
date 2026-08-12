@@ -1,7 +1,7 @@
 import React from "react";
-import Link from "next/link";
-import { cx, cva } from "@/lib/utils"; 
-import { useModal } from "@/hooks/useModal"; 
+import { Link } from "@shared/constants/navigation";
+import { cx } from '@lib/vendor';
+import { useModal } from '@shared/hooks/useModal';
 
 const icons = {
   "arrow-right": (props) => (

@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { Slot } from '@radix-ui/react-slot';
-import { cx } from '@/vendor/cx';
-
+import { cx } from '@lib/vendor';
 
 
 const SliderContext = createContext(null);

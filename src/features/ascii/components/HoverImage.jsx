@@ -1,10 +1,7 @@
 import * as React from "react";
-import { AsciiImageMesh } from "./AsciiImageMesh.jsx";
+import { AsciiImageMesh } from "@features/ascii/components/AsciiImageMesh";
 
-/**
- * Applies hover-based stretch / head-turn transforms to AsciiImageMesh.
- * original: fT
- */
+
 export function HoverImage({
   imageSrc,
   onLoad,

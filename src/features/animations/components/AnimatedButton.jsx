@@ -1,8 +1,7 @@
 import React, { useRef } from 'react';
-import { Slot } from '@radix-ui/react-slot';
+import { Slot, Slottable } from '@radix-ui/react-slot';
 import { cva, cx } from 'class-variance-authority';
-import { useDualLayerScramble } from '@hooks/useDualLayerScramble';
-import { Slottable } from '@components/Slottable';
+import useDualLayerScramble from '@features/animations/hooks/useDualLayerScramble';
 
 const buttonVariants = cva({
   base: [

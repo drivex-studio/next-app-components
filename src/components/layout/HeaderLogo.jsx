@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from '@/components/Link'; 
-import { cx } from '@/vendor'; 
+import { Link } from '@shared/constants/navigation';
+import { cx } from '@lib/vendor';
 
 export function LogoGood(props) {
   const { className, ...rest } = props;

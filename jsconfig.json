@@ -1,8 +1,34 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "allowJs": true,
+    "checkJs": false,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "env": ["./env.mjs"],
+      "@app/*": ["./src/app/*"],
+      "@providers/*": ["./src/providers/*"],
+      "@features/*": ["./src/features/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@utils/*": ["./src/shared/utils/*"],
+      "@components/*": ["./src/components/*"]
     }
-  }
+  },
+  "include": [
+    "src/**/*",
+    "next.config.mjs"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "__MACOSX",
+    "public"
+  ]
 }

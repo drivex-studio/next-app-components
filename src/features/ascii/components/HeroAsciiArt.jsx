@@ -2,11 +2,11 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { gsap, useGSAP, ScrollTrigger } from '@/vendor';
-import { useIsTouchDevice } from '@/hooks/useDeviceQueries';
-import { useMousePosition } from '@/hooks/useMousePosition';
-import { usePageEnter } from '@/hooks/usePageEnter';
-import { ASCII_GSAP_DURATION, ASCII_EASE, ASCII_COLOR_DELAY } from '@features/constants/ascii';
+import { gsap, useGSAP, ScrollTrigger } from '@lib/vendor';
+import { useIsTouchDevice } from '@shared/hooks/useIsTouchDevice';
+import { useMousePosition } from '@shared/hooks/useMousePosition';
+import { usePageEnter } from '@shared/hooks/usePageEnter';
+import { ASCII_GSAP_DURATION, ASCII_EASE, ASCII_COLOR_DELAY } from '@shared/constants/constants';
 
 function FallbackImage({ imageSrc }) {
   return (

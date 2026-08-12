@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { usePageTransitionContext } from '@contexts/PageTransitionProvider';
+import { usePageTransitionContext } from '@providers/PageTransitionProvider';
 
 export function usePageTransition() {
   const {
@@ -19,4 +19,3 @@ export function usePageTransition() {
 
   return transitionState;
 }
-

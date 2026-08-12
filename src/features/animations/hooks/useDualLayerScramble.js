@@ -1,10 +1,7 @@
 
 import { useRef, useEffect, useCallback } from 'react';
-import gsap from 'gsap';
-import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { gsap, ScrambleTextPlugin, ScrollTrigger } from '@lib/vendor';
 
-gsap.registerPlugin(ScrambleTextPlugin, ScrollTrigger);
 
 const DEFAULT_CHARS = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
 

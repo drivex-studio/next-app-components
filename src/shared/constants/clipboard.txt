@@ -1,0 +1,5 @@
+export const GradientType = {
+  Linear: 0,
+  Radial: 1,
+  MirroredLinear: 2
+};

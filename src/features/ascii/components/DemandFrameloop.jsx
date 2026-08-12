@@ -1,11 +1,6 @@
 import * as React from "react";
-import { useThree } from "@react-three/fiber"; // TODO: source not present — original hO
+import { useThree } from "@react-three/fiber"; 
 
-/**
- * When frameloop is "demand", schedules a single invalidate via requestIdleCallback
- * (or setTimeout fallback) so the first frame is drawn.
- * original: fE
- */
 function selectInvalidate(state) {
   return state.invalidate;
 }

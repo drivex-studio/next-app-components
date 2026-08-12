@@ -8,8 +8,8 @@ import React, {
   useContext 
 } from 'react';
 
-import { usePageTransition } from '@/hooks/usePageTransition';
-import { usePreloader } from './PreloaderProvider';
+import { usePageTransition } from '@shared/hooks/usePageTransition';
+import { usePreloader } from '@providers/PreloaderProvider';
 
 const PageEnterContext = createContext(null);
 

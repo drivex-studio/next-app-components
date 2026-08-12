@@ -1,21 +1,19 @@
 import React, { useRef, useState, useMemo, useEffect, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
+import { gsap, useGSAP } from '@lib/vendor';
 import { motion } from 'framer-motion';
+import { useBreakpoint } from '@shared/hooks/useIsTouchDevice';
+import { usePageTransition } from '@shared/hooks/usePageTransition';
+import useDualLayerScramble from '@features/animations/hooks/useDualLayerScramble';
+import { SanityLink } from '@lib/sanity/components/SanityLink';
+import { SanityImage } from '@lib/sanity/components/SanityImage';
+import { AnimatedLink } from '@features/animations/components/AnimatedLink';
+import { cx } from '@lib/vendor';
+import { easings } from '@shared/utils/easings';
 
-
-import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { usePageTransition } from '@/hooks/usePageTransition';
-import { useDualLayerScramble } from '@/hooks/useDualLayerScramble';
-import { SanityLink } from '@/components/SanityLink';
-import { SanityImage } from '@/components/SanityImage';
-import { AnimatedLink } from '@/components/AnimatedLink';
-import { cx } from '@/vendor';
-import { S, w } from '@/utils/easings'; 
-
-
+const S = easings.power3InOut;
+const w = easings.backInOut;
 
 export function NavigationFlyout({
   navItems,
