@@ -1,9 +1,10 @@
 import { Effect } from "postprocessing"; 
-import * from "three"; 
+import { Uniform, Color, Texture } from "three";
+
 import {
   onTextureCreated,
   onTextureDisposed
-} from "../constants/asciiConfig"; 
+} from "../constants/asciiConfig"; //missing path
 
 
 const ASCII_FRAGMENT_SHADER = `
