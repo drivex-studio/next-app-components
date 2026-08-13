@@ -1,9 +1,15 @@
 import { resolveImageSrc } from "./resolveImageSrc.js";
 
-export async function computeContentBounds(
-  src,
-  origin = { x: 0.5, y: 0.5 }
-) {
+/**
+ * Compute the normalized maximum distance from a reveal origin to non-transparent
+ * content pixels in the image. Used to scale the typewriter reveal so it finishes
+ * when content is fully covered.
+ *
+ * @param {string} imageSrc
+ * @param {{ x: number, y: number }} [origin={ x: 0.5, y: 0.5 }]
+ * @returns {Promise<number>}
+ */
+export async function getImageContentBounds(imageSrc, origin = { x: 0.5, y: 0.5 }) {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -12,9 +18,7 @@ export async function computeContentBounds(
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         if (!ctx) {
-          console.warn(
-            "[ASCII] Could not get canvas context, using default bounds"
-          );
+          console.warn("[ASCII] Could not get canvas context, using default bounds");
           resolve(1);
           return;
         }
@@ -29,7 +33,6 @@ export async function computeContentBounds(
         const data = ctx.getImageData(0, 0, w, h).data;
         const originX = origin.x * w;
         const originY = (1 - origin.y) * h;
-
         const maxPossible = Math.max(
           Math.hypot(originX, originY),
           Math.hypot(w - originX, originY),
@@ -59,8 +62,8 @@ export async function computeContentBounds(
           }
         }
 
-        const ratio = Math.min((maxContentDist / maxPossible) * 1.05, 1);
-        resolve(ratio);
+        const result = Math.min((maxContentDist / maxPossible) * 1.05, 1);
+        resolve(result);
       } catch (err) {
         console.warn("[ASCII] Error computing content bounds:", err);
         resolve(1);
@@ -70,6 +73,6 @@ export async function computeContentBounds(
       console.warn("[ASCII] Could not load image for bounds computation");
       resolve(1);
     };
-    img.src = resolveImageSrc(src);
+    img.src = resolveImageSrc(imageSrc);
   });
 }

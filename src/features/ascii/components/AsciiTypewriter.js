@@ -1,12 +1,23 @@
-import * as React from "react";
-import { clsx as cx } from "clsx"; 
-import { AsciiCanvas } from "@features/ascii/components/AsciiTypewriter";
-import { computeContentBounds } from "@features/ascii/utils/computeContentBounds";
-import { easeOutCubic } from "@features/ascii/utils/easeOutCubic";
-import { ASCII_ANIMATION_DURATION } from "@shared/constants/constants";
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { clsx } from "clsx";
+import { AsciiCanvas } from "./AsciiCanvas.js";
+import { getImageContentBounds } from "../utils/image/getImageContentBounds.js";
+import { easeOutCubic } from "../utils/easing.js";
+import { ASCII_CHARACTERS } from "../constants/asciiCharacters.js";
 
-const ASCII_ANIMATION_DURATION_MS = ASCII_ANIMATION_DURATION * 1000;
+// TODO: original module referenced ei.ASCII_ANIMATION_DURATION — value unknown, using 1000 ms fallback
+const ASCII_ANIMATION_DURATION_MS = 1000;
 
+/**
+ * Top-level public component: ASCII typewriter reveal of an image with
+ * optional click-to-replay radial color sweeps, hover gooey/parallax, and
+ * reduced-motion support.
+ */
 export function AsciiTypewriter({
   imageSrc,
   className,
@@ -48,37 +59,37 @@ export function AsciiTypewriter({
   dpr,
   skipContentBounds = false,
 }) {
-  const effectRef = React.useRef(null);
-  const [progress, setProgress] = React.useState(0);
-  const [colorProgress, setColorProgress] = React.useState(0);
-  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
-  const [contentBoundsScale, setContentBoundsScale] = React.useState(1);
-  const [clickColorProgress, setClickColorProgress] = React.useState(null);
-  const [clickPoint, setClickPoint] = React.useState(null);
-  const [clickRadialInvert, setClickRadialInvert] = React.useState(false);
-  const [impactProgress, setImpactProgress] = React.useState(0);
+  const effectRef = useRef(null);
+  const [progress, setProgress] = useState(0);
+  const [colorProgress, setColorProgress] = useState(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [contentBoundsScale, setContentBoundsScale] = useState(1);
+  const [clickColorProgress, setClickColorProgress] = useState(null);
+  const [clickPoint, setClickPoint] = useState(null);
+  const [clickRadialInvert, setClickRadialInvert] = useState(false);
+  const [impactProgress, setImpactProgress] = useState(0);
 
-  const animationStartedRef = React.useRef(false);
-  const clickAnimFrameRef = React.useRef(null);
-  const impactAnimFrameRef = React.useRef(null);
-  const internalAnimDoneRef = React.useRef(false);
-  const lastClickTimeRef = React.useRef(0);
-  const revealOriginRef = React.useRef(revealOrigin);
+  const animationCompleteRef = useRef(false);
+  const clickAnimFrameRef = useRef(null);
+  const impactAnimFrameRef = useRef(null);
+  const isInvertedRef = useRef(false);
+  const clickStartTimeRef = useRef(0);
+  const revealOriginRef = useRef(revealOrigin);
   revealOriginRef.current = revealOrigin;
 
-  const containerRef = React.useRef(null);
-  const isIntersectingRef = React.useRef(false);
+  const containerRef = useRef(null);
+  const isInViewRef = useRef(false);
 
-  
-  React.useEffect(() => {
+  // Compute content bounds so the typewriter finishes when real content is covered
+  useEffect(() => {
     if (skipContentBounds) return;
-    computeContentBounds(imageSrc, revealOrigin).then((scale) => {
+    getImageContentBounds(imageSrc, revealOrigin).then((scale) => {
       setContentBoundsScale(scale);
     });
   }, [imageSrc, revealOrigin.x, revealOrigin.y, revealOrigin, skipContentBounds]);
 
-  
-  React.useEffect(() => {
+  // Reduced-motion preference
+  useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setPrefersReducedMotion(mq.matches);
     const handler = (e) => setPrefersReducedMotion(e.matches);
@@ -86,19 +97,18 @@ export function AsciiTypewriter({
     return () => mq.removeEventListener("change", handler);
   }, []);
 
-  const useExternalProgress =
-    disableInternalAnimation && externalProgress !== undefined;
+  const useExternal = disableInternalAnimation && externalProgress !== undefined;
 
-  
-  React.useEffect(() => {
+  // Internal typewriter animation
+  useEffect(() => {
     if (disableInternalAnimation) {
-      internalAnimDoneRef.current = true;
+      animationCompleteRef.current = true;
       return;
     }
     if (prefersReducedMotion) {
       setProgress(1);
       setColorProgress(1);
-      internalAnimDoneRef.current = true;
+      animationCompleteRef.current = true;
       onComplete?.();
       return;
     }
@@ -112,7 +122,6 @@ export function AsciiTypewriter({
         rafId = requestAnimationFrame(tick);
         return;
       }
-
       const t = Math.min(elapsed / duration, 1);
       setProgress(linear ? t : easeOutCubic(t));
 
@@ -126,7 +135,7 @@ export function AsciiTypewriter({
       if (t < 1 || !colorDone) {
         rafId = requestAnimationFrame(tick);
       } else {
-        internalAnimDoneRef.current = true;
+        animationCompleteRef.current = true;
         onComplete?.();
       }
     };
@@ -137,15 +146,15 @@ export function AsciiTypewriter({
     };
   }, [delay, duration, colorDelay, linear, prefersReducedMotion, onComplete, disableInternalAnimation]);
 
-  
-  const triggerClickReveal = React.useRef(() => {});
-  triggerClickReveal.current = (point, delayMs = 0) => {
-    if (!internalAnimDoneRef.current || clickAnimFrameRef.current !== null) return;
+  // Click / keyboard replay of the color sweep
+  const triggerClickReplay = useRef(() => {});
+  triggerClickReplay.current = (point, delayMs = 0) => {
+    if (!animationCompleteRef.current || clickAnimFrameRef.current !== null) return;
 
-    const invert = !animationStartedRef.current;
-    animationStartedRef.current = invert;
+    const invert = !isInvertedRef.current;
+    isInvertedRef.current = invert;
     const startTime = performance.now();
-    lastClickTimeRef.current = startTime;
+    clickStartTimeRef.current = startTime;
     setClickPoint(point);
     if (point) setClickRadialInvert(invert);
 
@@ -166,7 +175,7 @@ export function AsciiTypewriter({
           clickAnimFrameRef.current = requestAnimationFrame(animate);
         } else {
           clickAnimFrameRef.current = null;
-          if (lastClickTimeRef.current === startTime) {
+          if (clickStartTimeRef.current === startTime) {
             setClickPoint(null);
             setClickRadialInvert(false);
           }
@@ -182,8 +191,7 @@ export function AsciiTypewriter({
     }
   };
 
-  
-  const triggerImpact = React.useRef(() => {});
+  const triggerImpact = useRef(() => {});
   triggerImpact.current = () => {
     if (prefersReducedMotion) return;
     if (impactAnimFrameRef.current !== null) {
@@ -203,9 +211,9 @@ export function AsciiTypewriter({
     impactAnimFrameRef.current = requestAnimationFrame(animate);
   };
 
-  
-  React.useEffect(() => {
-    const onKeyDown = (e) => {
+  // Keyboard "c" to replay from reveal origin (when in view)
+  useEffect(() => {
+    const onKey = (e) => {
       if (
         (e.key !== "c" && e.key !== "C") ||
         e.metaKey ||
@@ -223,20 +231,20 @@ export function AsciiTypewriter({
       ) {
         return;
       }
-      if (isIntersectingRef.current) {
-        lastClickTimeRef.current = performance.now();
+      if (isInViewRef.current) {
+        clickStartTimeRef.current = performance.now();
         setClickPoint(revealOriginRef.current);
         triggerImpact.current();
-        triggerClickReveal.current(revealOriginRef.current);
+        triggerClickReplay.current(revealOriginRef.current);
       }
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  
-  React.useEffect(() => {
-    return () => {
+  // Cleanup animation frames
+  useEffect(
+    () => () => {
       if (clickAnimFrameRef.current !== null) {
         cancelAnimationFrame(clickAnimFrameRef.current);
         clickAnimFrameRef.current = null;
@@ -245,18 +253,17 @@ export function AsciiTypewriter({
         cancelAnimationFrame(impactAnimFrameRef.current);
         impactAnimFrameRef.current = null;
       }
-    };
-  }, []);
+    },
+    []
+  );
 
-  
-  React.useEffect(() => {
+  // Track visibility for keyboard shortcut
+  useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry) {
-          isIntersectingRef.current = entry.isIntersecting;
-        }
+        if (entry) isInViewRef.current = entry.isIntersecting;
       },
       { threshold: 0.1 }
     );
@@ -264,15 +271,15 @@ export function AsciiTypewriter({
     return () => observer.disconnect();
   }, []);
 
-  const onClick = React.useCallback((e) => {
-    if (!internalAnimDoneRef.current || clickAnimFrameRef.current !== null) return;
+  const onClick = useCallback((e) => {
+    if (!animationCompleteRef.current || clickAnimFrameRef.current !== null) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = 1 - (e.clientY - rect.top) / rect.height;
-    lastClickTimeRef.current = performance.now();
+    clickStartTimeRef.current = performance.now();
     setClickPoint({ x, y });
     triggerImpact.current();
-    triggerClickReveal.current({ x, y });
+    triggerClickReplay.current({ x, y });
   }, []);
 
   const effectiveColorProgress =
@@ -280,64 +287,67 @@ export function AsciiTypewriter({
       ? clickColorProgress
       : prefersReducedMotion
         ? 1
-        : useExternalProgress
-          ? externalColorProgress ?? externalProgress
+        : useExternal
+          ? (externalColorProgress ?? externalProgress)
           : colorProgress;
 
-  return (
-    <div
-      ref={containerRef}
-      onClick={onClick}
-      className="size-full cursor-pointer"
-    >
-      <AsciiCanvas
-        imageSrc={imageSrc}
-        className={cx("size-full", className)}
-        color={color}
-        {...(cellSize !== undefined ? { cellSize } : {})}
-        progress={
-          (prefersReducedMotion
-            ? 1
-            : useExternalProgress
-              ? externalProgress
-              : progress) * contentBoundsScale
-        }
-        colorProgress={effectiveColorProgress * contentBoundsScale}
-        randomness={randomness}
-        revealDirection={alignX === "right" ? -1 : 1}
-        revealEnd={revealEnd}
-        effectRef={effectRef}
-        alignX={alignX}
-        alignY={alignY}
-        fit={fit}
-        mobileFit={mobileFit}
-        enableHover={enableHover}
-        hoverMode={hoverMode}
-        hoverIntensity={hoverIntensity}
-        mouseX={mouseX}
-        mouseY={mouseY}
-        mouseRef={mouseRef}
-        enableGooeyReveal={enableGooeyReveal}
-        gooeyRadius={gooeyRadius}
-        gooeySoftness={gooeySoftness}
-        gooeyNoiseIntensity={gooeyNoiseIntensity}
-        isHovering={isHovering}
-        enableDepthParallax={enableDepthParallax}
-        depthMapSrc={depthMapSrc}
-        parallaxIntensity={parallaxIntensity}
-        clickPoint={clickPoint}
-        clickRadialInvert={clickRadialInvert}
-        impactProgress={impactProgress}
-        revealOrigin={revealOrigin}
-        {...(colorDark !== undefined ? { colorDark } : {})}
-        {...(depthDetailMin !== undefined ? { depthDetailMin } : {})}
-        {...(frameloop !== undefined ? { frameloop } : {})}
-        {...(debugLabel !== undefined ? { debugLabel } : {})}
-        {...(dpr !== undefined ? { dpr } : {})}
-      />
-    </div>
+  const finalProgress =
+    (prefersReducedMotion
+      ? 1
+      : useExternal
+        ? externalProgress
+        : progress) * contentBoundsScale;
+
+  const finalColorProgress = effectiveColorProgress * contentBoundsScale;
+
+  return React.createElement(
+    "div",
+    {
+      ref: containerRef,
+      onClick,
+      className: "size-full cursor-pointer",
+    },
+    React.createElement(AsciiCanvas, {
+      imageSrc,
+      className: clsx("size-full", className),
+      color,
+      ...(cellSize !== undefined ? { cellSize } : {}),
+      progress: finalProgress,
+      colorProgress: finalColorProgress,
+      randomness,
+      revealDirection: alignX === "right" ? -1 : 1,
+      revealEnd,
+      effectRef,
+      alignX,
+      alignY,
+      fit,
+      mobileFit,
+      enableHover,
+      hoverMode,
+      hoverIntensity,
+      mouseX,
+      mouseY,
+      mouseRef,
+      enableGooeyReveal,
+      gooeyRadius,
+      gooeySoftness,
+      gooeyNoiseIntensity,
+      isHovering,
+      enableDepthParallax,
+      depthMapSrc,
+      parallaxIntensity,
+      clickPoint,
+      clickRadialInvert,
+      impactProgress,
+      revealOrigin,
+      ...(colorDark !== undefined ? { colorDark } : {}),
+      ...(depthDetailMin !== undefined ? { depthDetailMin } : {}),
+      ...(frameloop !== undefined ? { frameloop } : {}),
+      ...(debugLabel !== undefined ? { debugLabel } : {}),
+      ...(dpr !== undefined ? { dpr } : {}),
+    })
   );
 }
 
-
-export { AsciiTypewriter as default };
+// Re-export for convenience (original module ID 271913)
+export default AsciiTypewriter;

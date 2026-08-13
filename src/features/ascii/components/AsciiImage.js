@@ -1,8 +1,10 @@
-import * as React from "react";
-import { AsciiImageMesh } from "@features/ascii/components/AsciiImageMesh";
+import React, { useMemo } from "react";
+import { AsciiImagePlane } from "./AsciiImagePlane.js";
 
-
-export function HoverImage({
+/**
+ * Applies hover-driven stretch or head-turn rotation to the underlying image plane.
+ */
+export function AsciiImage({
   imageSrc,
   onLoad,
   alignX,
@@ -34,17 +36,15 @@ export function HoverImage({
     }
   }
 
-  return (
-    <AsciiImageMesh
-      imageSrc={imageSrc}
-      onLoad={onLoad}
-      alignX={alignX}
-      alignY={alignY}
-      fit={fit}
-      stretchX={stretchX}
-      stretchY={stretchY}
-      rotationX={0}
-      rotationY={rotationY}
-    />
-  );
+  return React.createElement(AsciiImagePlane, {
+    imageSrc,
+    onLoad,
+    alignX,
+    alignY,
+    fit,
+    stretchX,
+    stretchY,
+    rotationX: 0,
+    rotationY,
+  });
 }
