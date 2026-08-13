@@ -18,7 +18,8 @@
       "@shared/*": ["./src/shared/*"],
       "@lib/*": ["./src/lib/*"],
       "@utils/*": ["./src/shared/utils/*"],
-      "@components/*": ["./src/components/*"]
+      "@components/*": ["./src/components/*"],
+      "@ascii": ["./src/features/ascii/*"]
     }
   },
   "include": [
